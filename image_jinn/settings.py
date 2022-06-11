@@ -43,13 +43,11 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-
     # Third party apps
     "corsheaders",
     "rest_framework",
     "rest_framework.authtoken",
     "drf_spectacular",
-
     # Custom apps
     "apps.images",
 ]
@@ -170,3 +168,20 @@ SPECTACULAR_SETTINGS = {
         "displayOperationId": True,
     },
 }
+
+# AWS
+AWS_ACCESS_KEY_ID = env("AWS_ACCESS_KEY_ID", "minioadmin")
+AWS_SECRET_ACCESS_KEY = env("AWS_SECRET_ACCESS_KEY", "minioadmin")
+AWS_BUCKET_NAME = env("AWS_BUCKET_NAME", "backend-local")
+AWS_BUCKET_REGION = env("AWS_BUCKET_REGION", "ap-south-1")
+AWS_EXPIRY = 604700
+AWS_S3_ENDPOINT_URL = env("AWS_S3_ENDPOINT_URL", "http://127.0.0.1:9000")
+AWS_S3_ADDRESSING_STYLE = env("AWS_S3_ADDRESSING_STYLE")
+
+# Celery
+CELERY_BROKER_URL = env("CELERY_BROKER_URL", "redis://127.0.0.1:6379")
+CELERY_RESULT_BACKEND = env("CELERY_RESULT_BACKEND", "redis://127.0.0.1:6379")
+CELERY_ACCEPT_CONTENT = ["application/json"]
+CELERY_TASK_SERIALIZER = "json"
+CELERY_RESULT_SERIALIZER = "json"
+CELERY_TIMEZONE = "UTC"
