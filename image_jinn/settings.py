@@ -91,12 +91,12 @@ DEFAULT_DB = str(os.path.join(BASE_DIR, "db.sqlite3"))
 
 DATABASES = {
     "default": {
-        "ENGINE": env("DATABASE_ENGINE", default="django.db.backends.sqlite3"),
+        "ENGINE": env("DATABASE_ENGINE", "django.db.backends.sqlite3"),
         "NAME": env("DATABASE_NAME", DEFAULT_DB),
-        "USER": env("DATABASE_USER"),
-        "HOST": env("DATABASE_HOST"),
-        "PORT": env("DATABASE_PORT"),
-        "PASSWORD": env("DATABASE_PASSWORD"),
+        "USER": env("DATABASE_USER", "postgres"),
+        "HOST": env("DATABASE_HOST", "localhost"),
+        "PORT": env("DATABASE_PORT", "postgres"),
+        "PASSWORD": env("DATABASE_PASSWORD", "postgres"),
     }
 }
 
@@ -185,7 +185,3 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
-
-
-TEST_SERVER_MODE = True
-# MOTO_PORT = 5000
