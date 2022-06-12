@@ -32,7 +32,7 @@ DEBUG = env("DEBUG", "0") == "1"
 
 ALLOWED_HOSTS = str(env("ALLOWED_HOSTS")).split(", ")
 CORS_ALLOW_ALL_ORIGINS = env("CORS_ALLOW_ALL_ORIGINS", "0") == "1"
-CORS_ALLOWED_ORIGINS = str(env("CORS_ALLOWED_ORIGINS")).split(", ")
+# CORS_ALLOWED_ORIGINS = str(env("CORS_ALLOWED_ORIGINS")).split(", ")
 
 # Application definition
 
@@ -185,3 +185,7 @@ CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_TASK_SERIALIZER = "json"
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TIMEZONE = "UTC"
+
+
+TEST_SERVER_MODE = True
+# MOTO_PORT = 5000

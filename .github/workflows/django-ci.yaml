@@ -25,5 +25,13 @@ jobs:
         env:
           CORS_ALLOW_ALL_ORIGINS: 1
           CORS_ALLOWED_ORIGINS: http://localhost:3000, https://localhost:3000
+          AWS_ACCESS_KEY_ID: testing
+          AWS_SECRET_ACCESS_KEY: testing
+          AWS_SECURITY_TOKEN: testing
+          AWS_SESSION_TOKEN: testing
+          AWS_BUCKET_REGION: us-east-1
+          AWS_BUCKET_NAME: bucket
+          AWS_S3_ENDPOINT_URL: http://127.0.0.1:5000
         run: |
-          python manage.py test
+          moto_server
+          python manage.py test apps
