@@ -1,5 +1,6 @@
+from django.contrib.postgres.fields import ArrayField
 from django.utils.translation import ugettext_lazy as _
-from django.db.models import TextField, CharField, PositiveSmallIntegerField
+from django.db.models import TextField, CharField, PositiveSmallIntegerField, JSONField
 
 from apps.contrib.models import BaseModel
 from apps.images.choices import UploadStatus
@@ -13,6 +14,13 @@ class Image(BaseModel):
         default=UploadStatus.UPLOADING,
         help_text=_("Image upload status"),
     )
+    available_extensions = ArrayField(
+        default=list,
+        base_field=CharField(
+            max_length=25, help_text="Image format like png, jpg, jpeg, etc"
+        ),
+        help_text=_("Store available extensions as a Array/List"),
+    )
     message = TextField(null=True, blank=True, help_text=_("Error messages, if any"))
 
     @property
@@ -21,6 +29,7 @@ class Image(BaseModel):
         return f"images/{self.id}/image-{self.id}.{ext}"
 
     class Meta:
+        ordering = ("-created_at",)
         verbose_name = _("Image")
         verbose_name_plural = _("Images")
 
