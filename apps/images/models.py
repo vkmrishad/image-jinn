@@ -18,8 +18,11 @@ class Image(BaseModel):
     @property
     def key(self):
         ext = self.name.split(".")[-1]
-        return f"images/{self.id}.{ext}"
+        return f"images/{self.id}/image-{self.id}.{ext}"
 
     class Meta:
         verbose_name = _("Image")
         verbose_name_plural = _("Images")
+
+    def __str__(self):
+        return self.key

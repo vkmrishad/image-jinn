@@ -1,6 +1,7 @@
 from django.utils.translation import ugettext_lazy as _
 
 from drf_spectacular.utils import extend_schema_field
+from rest_framework.exceptions import ValidationError
 from rest_framework.fields import SerializerMethodField, CharField
 from rest_framework.serializers import ModelSerializer, Serializer
 
@@ -17,7 +18,7 @@ class ImageSerializer(ModelSerializer):
 
     class Meta:
         model = Image
-        fields = ["id", "name", "mimetype", "status", "presigned_url", "message"]
+        fields = ("id", "name", "mimetype", "status", "presigned_url", "message")
 
     def get_status(self, obj):
         return obj.get_status_display()
@@ -25,6 +26,26 @@ class ImageSerializer(ModelSerializer):
     @extend_schema_field(CharField)
     def get_presigned_url(self, obj):
         return generate_presigned_url(obj.key)
+
+    @staticmethod
+    def validate_name(name):
+        if name:
+            if not name.lower().endswith((".jpg", ".jpeg", ".png")):
+                raise ValidationError(
+                    {"error": "Not a valid image format (.png, .jpg, .jpeg)"}
+                )
+        return name
+
+    @staticmethod
+    def validate_mimetype(mimetype):
+        if mimetype:
+            if not mimetype in ("image/jpg", ".image/jpeg", "image/png"):
+                raise ValidationError(
+                    {
+                        "error": "Not a valid mimetype (image/jpg, .image/jpeg, image/png)"
+                    }
+                )
+        return mimetype
 
 
 class ImageUploadSerializer(ModelSerializer):
@@ -38,7 +59,7 @@ class ImageUploadSerializer(ModelSerializer):
 
     class Meta:
         model = Image
-        fields = [
+        fields = (
             "id",
             "name",
             "mimetype",
@@ -46,7 +67,7 @@ class ImageUploadSerializer(ModelSerializer):
             "presigned_post_url",
             "presigned_url",
             "message",
-        ]
+        )
 
     def get_status(self, obj):
         return obj.get_status_display()
@@ -60,6 +81,26 @@ class ImageUploadSerializer(ModelSerializer):
     @extend_schema_field(CharField)
     def get_presigned_url(self, obj):
         return generate_presigned_url(obj.key)
+
+    @staticmethod
+    def validate_name(name):
+        if name:
+            if not name.lower().endswith((".jpg", ".jpeg", ".png")):
+                raise ValidationError(
+                    {"error": "Not a valid image format (.png, .jpg, .jpeg)"}
+                )
+        return name
+
+    @staticmethod
+    def validate_mimetype(mimetype):
+        if mimetype:
+            if not mimetype in ("image/jpg", ".image/jpeg", "image/png"):
+                raise ValidationError(
+                    {
+                        "error": "Not a valid mimetype (image/jpg, .image/jpeg, image/png)"
+                    }
+                )
+        return mimetype
 
 
 class ImageUploadFinishedInputSerializer(Serializer):

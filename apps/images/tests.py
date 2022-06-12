@@ -3,7 +3,6 @@ import requests
 
 from moto import mock_s3
 
-from django.test import TestCase
 from django.conf import settings
 from rest_framework import status
 
@@ -59,6 +58,9 @@ class ImageTestCase(APITestCase):
         self.mock_s3.stop()
 
     def test_presigned_post_url(self):
+        """
+        Test presigned_post_url method
+        """
         key = "test/car.jpg"
         response = generate_presigned_post(key)
         fields = response.get("fields")
@@ -85,6 +87,9 @@ class ImageTestCase(APITestCase):
         self.assertEqual(check_file_exists(key), True)
 
     def test_presigned_url(self):
+        """
+        Test presigned_url method that will give signed file url
+        """
         key = "test/flower.png"
         response = generate_presigned_post(key)
         fields = response.get("fields")
@@ -116,10 +121,45 @@ class ImageTestCase(APITestCase):
         res = requests.request("GET", file_url)
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-    def test_image_upload_endpoint(self):
-        file_name = "sample.jpg"
+    def test_image_upload_with_wrong_format(self):
+        """
+        Test image upload with wrong format. Only accepts (.png, .jpg, .jpeg)
+        """
+        file_name = "sample.gif"
+        request = self.client.post(
+            "/api/images/upload", {"name": file_name, "mimetype": "image/png"}
+        )
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+        file_name = "sample.svg"
+        request = self.client.post(
+            "/api/images/upload", {"name": file_name, "mimetype": "image/png"}
+        )
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_image_upload_with_wrong_format(self):
+        """
+        Test image upload with wrong mimetype. Only accepts (image/png, image/jpg, image/jpeg)
+        """
+        file_name = "sample.jpeg"
+        request = self.client.post(
+            "/api/images/upload", {"name": file_name, "mimetype": "image/gif"}
+        )
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+        file_name = "sample.png"
         request = self.client.post(
             "/api/images/upload", {"name": file_name, "mimetype": "image/jpeg"}
+        )
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_image_upload_endpoint(self):
+        """
+        Test image upload endpoint
+        """
+        file_name = "sample.jpg"
+        request = self.client.post(
+            "/api/images/upload", {"name": file_name, "mimetype": "image/jpg"}
         )
         response = request.json()
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
@@ -159,9 +199,12 @@ class ImageTestCase(APITestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
 
     def test_image_get_endpoint(self):
+        """
+        Test image get endpoint
+        """
         file_name = "sample.png"
         request = self.client.post(
-            "/api/images/upload", {"name": file_name, "mimetype": "image/jpeg"}
+            "/api/images/upload", {"name": file_name, "mimetype": "image/png"}
         )
         response = request.json()
         self.assertEqual(request.status_code, status.HTTP_201_CREATED)
