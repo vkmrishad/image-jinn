@@ -33,5 +33,5 @@ jobs:
           AWS_BUCKET_NAME: bucket
           AWS_S3_ENDPOINT_URL: http://127.0.0.1:5000
         run: |
-          moto_server
+          moto_server &
           python manage.py test apps
