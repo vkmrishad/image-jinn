@@ -1,5 +1,6 @@
 from celery.utils.log import get_task_logger
 from drf_spectacular.utils import extend_schema
+from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.exceptions import ValidationError
 from rest_framework.mixins import CreateModelMixin
@@ -53,7 +54,9 @@ class ImageUploadViewSet(CreateModelMixin, GenericViewSet):
 
         # task will execute after 5 minutes to verify file uploaded
         process_image_upload.s(image.id).apply_async(countdown=300)
-        return Response(self.get_serializer(image, many=False).data)
+        return Response(
+            self.get_serializer(image, many=False).data, status=status.HTTP_201_CREATED
+        )
 
 
 class ImageViewSet(ModelViewSet):
