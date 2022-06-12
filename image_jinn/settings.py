@@ -95,7 +95,7 @@ DATABASES = {
         "NAME": env("DATABASE_NAME", DEFAULT_DB),
         "USER": env("DATABASE_USER", "postgres"),
         "HOST": env("DATABASE_HOST", "localhost"),
-        "PORT": env("DATABASE_PORT", "postgres"),
+        "PORT": env("DATABASE_PORT", 5432),
         "PASSWORD": env("DATABASE_PASSWORD", "postgres"),
     }
 }
