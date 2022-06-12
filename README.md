@@ -44,11 +44,17 @@ For environment variables follow [sample.env](/sample.env)
     or
     $ ./manage.py runserver
 
+## Run Celery
+
+    $ celery -A image_jinn  worker -l info
+
+## Runserver using docker
+Check this documentation to run with [docker](https://docs.docker.com/desktop/), refer [link](https://docs.docker.com/samples/django/)
+
+    $ docker-compose up
+
 #### Access server: http://127.0.0.1:8000
 #### Access Admin: http://127.0.0.1:8000/admin/
-
-[//]: # (## Runserver using docker)
-[//]: # (Check this documentation to run with docker, refer [link]&#40;https://docs.docker.com/samples/django/&#41;)
 
 ## API Endpoints
 Check Swagger/Redoc documantation after running server
@@ -66,7 +72,7 @@ moto_server will be running on http://127.0.0.1:5000, then run test
     or
     $ ./manage.py test apps
 
-## SuperUser
+## Create superuser
 Create superuser to test admin feature
 
     $ python manage.py createsuperuser
