@@ -1,0 +1,87 @@
+version: '3.7'
+
+services:
+#  db:
+#    image: postgres
+#    volumes:
+#      - ./data/db:/var/lib/postgresql/data
+#    environment:
+#      - POSTGRES_DB=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_PASSWORD=postgres
+  db:
+    image: postgres:12-alpine
+    restart: always
+    volumes:
+      - ./data/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    env_file:
+      - .env
+    networks:
+      - live
+
+  redis:
+    image: 'redis:alpine'
+    hostname: redis
+    networks:
+      - live
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    hostname: app
+    stdin_open: true
+    expose:
+      - '8000'
+    volumes:
+      - .:/app
+#    command: bash -c "python manage.py migrate && gunicorn myproject.wsgi:application -b 0.0.0.0:8000"
+    command: python manage.py runserver 0.0.0.0:8000
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+      - db
+    env_file:
+      - .env
+    networks:
+      - live
+
+  nginx:
+    image: nginx
+    hostname: nginx
+    ports:
+      - '82:8000'
+    volumes:
+      - ./config/nginx:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - live
+
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: "celery -A image_jinn worker -l info"
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    depends_on:
+      - app
+      - redis
+      - db
+    restart: on-failure
+    networks:
+      - live
+
+#volumes:
+#  data:
+
+networks:
+  live:
