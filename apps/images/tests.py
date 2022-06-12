@@ -68,7 +68,7 @@ class ImageTestCase(APITestCase):
         # Checking key before upload
         self.assertEqual(check_file_exists(key), False)
 
-        # POST method over response data
+        # POST method over response data to upload image file
         url = response.get("url")
         payload = fields
         files = [
@@ -100,7 +100,7 @@ class ImageTestCase(APITestCase):
         res = requests.request("GET", file_url)
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
-        # POST method over response data
+        # POST method over response data to upload image file
         url = response.get("url")
         payload = fields
         files = [
@@ -157,6 +157,7 @@ class ImageTestCase(APITestCase):
         """
         Test image upload endpoint
         """
+        # Request a presigned post url for file upload
         file_name = "sample.jpg"
         request = self.client.post(
             "/api/images/upload", {"name": file_name, "mimetype": "image/jpg"}
@@ -175,7 +176,7 @@ class ImageTestCase(APITestCase):
         res = requests.request("GET", file_url)
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
-        # POST method over response data
+        # POST method over response data to upload image file
         url = url
         payload = fields
         files = [
@@ -202,6 +203,7 @@ class ImageTestCase(APITestCase):
         """
         Test image get endpoint
         """
+        # Request a presigned post url for file upload
         file_name = "sample.png"
         request = self.client.post(
             "/api/images/upload", {"name": file_name, "mimetype": "image/png"}
@@ -222,11 +224,11 @@ class ImageTestCase(APITestCase):
         response = request.json()
         self.assertEqual(request.status_code, status.HTTP_200_OK)
 
-        # Checking response image url
+        # Checking image url, if file found
         res = requests.request("GET", response.get("presigned_url"))
         self.assertEqual(res.status_code, status.HTTP_404_NOT_FOUND)
 
-        # POST method over response data
+        # POST method over response data to upload image file to upload image file
         url = url
         payload = fields
         files = [
@@ -251,6 +253,74 @@ class ImageTestCase(APITestCase):
         response = request.json()
         self.assertEqual(request.status_code, status.HTTP_200_OK)
 
-        # Checking response image url
+        # Checking image url, if file found
         res = requests.request("GET", response.get("presigned_url"))
         self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+    def test_image_conversion_with_get_endpoint(self):
+        """
+        Test image conversion, when passing query param ?extension=jpg|jpeg|png to get converted file
+        """
+        # Request a presigned post url for file upload
+        file_name = "sample.jpg"
+        request = self.client.post(
+            "/api/images/upload", {"name": file_name, "mimetype": "image/jpg"}
+        )
+        response = request.json()
+        self.assertEqual(request.status_code, status.HTTP_201_CREATED)
+
+        image_id = response.get("id")
+        fields = response.get("presigned_post_url").get("fields")
+        url = response.get("presigned_post_url").get("url")
+        key = fields.get("key")
+
+        # POST method over response data to upload image file to upload image file
+        url = url
+        payload = fields
+        files = [
+            (
+                "file",
+                (
+                    key,
+                    open("data/images/car.jpg", "rb"),
+                    "image/jpg",
+                ),
+            )
+        ]
+
+        response = requests.request("POST", url, data=payload, files=files)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
+
+        # Get endpoint calling after upload, first uploaded file
+        request = self.client.get(f"/api/images/{image_id}/")
+        response = request.json()
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response["available_extensions"]), 1)
+        self.assertIn("jpg", response["available_extensions"])
+        # Checking image url, if file found
+        res = requests.request("GET", response.get("presigned_url"))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # File conversion from jpg to jpeg
+        request = self.client.get(f"/api/images/{image_id}/?extension=jpeg")
+        response = request.json()
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response["available_extensions"]), 2)
+        self.assertIn("jpeg", response["available_extensions"])
+        # Checking image url, if file found
+        res = requests.request("GET", response.get("presigned_url"))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # File conversion from jpg to png
+        request = self.client.get(f"/api/images/{image_id}/?extension=png")
+        response = request.json()
+        self.assertEqual(request.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(response["available_extensions"]), 3)
+        self.assertIn("png", response["available_extensions"])
+        # Checking image url, if file found
+        res = requests.request("GET", response.get("presigned_url"))
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+
+        # File conversion, invalid extension only works for jpg, jpeg, png
+        request = self.client.get(f"/api/images/{image_id}/?extension=gif")
+        self.assertEqual(request.status_code, status.HTTP_400_BAD_REQUEST)

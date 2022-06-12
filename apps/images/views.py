@@ -129,7 +129,7 @@ class ImageViewSet(ModelViewSet):
     def upload_finished(self, request, *args, **kwargs):
         """
         This endpoint will set image upload status to uploaded.
-        If image not uploaded to s3, it will create a celery task to check after 5 mins
+        If image not uploaded to s3, it will create a celery task to check after 5 minutes
         """
         instance = self.get_object()
 
