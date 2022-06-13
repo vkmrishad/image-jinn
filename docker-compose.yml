@@ -1,23 +1,11 @@
 version: '3.7'
 
 services:
-#  db:
-#    image: postgres
-#    volumes:
-#      - ./data/db:/var/lib/postgresql/data
-#    environment:
-#      - POSTGRES_DB=postgres
-#      - POSTGRES_USER=postgres
-#      - POSTGRES_PASSWORD=postgres
-  db:
+  postgres:
     image: postgres:12-alpine
     restart: always
     volumes:
-      - ./data/db:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - ./data/postgres:/var/lib/postgresql/data
     env_file:
       - .env
     networks:
@@ -39,13 +27,12 @@ services:
       - '8000'
     volumes:
       - .:/app
-#    command: bash -c "python manage.py migrate && gunicorn myproject.wsgi:application -b 0.0.0.0:8000"
-    command: python manage.py runserver 0.0.0.0:8000
+    command: bash -c "python manage.py runserver 0.0.0.0:8000"
     ports:
       - "8000:8000"
     depends_on:
       - redis
-      - db
+      - postgres
     env_file:
       - .env
     networks:
@@ -75,13 +62,10 @@ services:
     depends_on:
       - app
       - redis
-      - db
+      - postgres
     restart: on-failure
     networks:
       - live
-
-#volumes:
-#  data:
 
 networks:
   live:

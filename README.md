@@ -50,8 +50,26 @@ For environment variables follow [sample.env](/sample.env)
 
 ## Runserver using docker
 Check this documentation to run with [docker](https://docs.docker.com/desktop/), refer [link](https://docs.docker.com/samples/django/)
+Create .env file in project folder and copy all ENV vars without having `export`.
 
+For initial db setup add, postgres ENV vars
+```
+POSTGRES_DB=postgres
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=postgres
+```
+You can use your own values, Please use `DATABASE_HOST='postgres'` for docker settings only
+
+    $ docker-compose build
     $ docker-compose up
+
+For shutting down use,
+
+    $ docker-compose down
+
+Apply migration to database
+
+    $ docker-compose exec app python manage.py migrate
 
 #### Access server: http://127.0.0.1:8000
 #### Access Admin: http://127.0.0.1:8000/admin/
