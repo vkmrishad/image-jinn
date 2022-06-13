@@ -71,6 +71,11 @@ Apply migration to database
 
     $ docker-compose exec app python manage.py migrate
 
+Testing
+
+    $ docker-compose exec app moto_server &
+    $ docker-compose exec app python manage.py test apps
+
 #### Access server: http://127.0.0.1:8000
 #### Access Admin: http://127.0.0.1:8000/admin/
 
