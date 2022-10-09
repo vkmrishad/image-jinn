@@ -80,6 +80,12 @@ Testing
 #### Access Admin: http://127.0.0.1:8000/admin/
 
 ## API Endpoints
+Run collect static to update swagger templates
+
+    $ python manage.py collectstatic
+    or
+    $ ./manage.py collectstatic
+
 Check Swagger/Redoc documantation after running server
 #### Swagger: http://127.0.0.1:8000/api/
 #### Redoc: http://127.0.0.1:8000/redoc/
