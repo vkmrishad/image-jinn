@@ -71,6 +71,10 @@ Apply migration to database
 
     $ docker-compose exec app python manage.py migrate
 
+Collect static command for swagger
+
+    $ docker-compose exec app python manage.py collectstatic
+
 Testing
 
     $ docker-compose exec app moto_server &
